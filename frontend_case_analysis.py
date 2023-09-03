@@ -6,72 +6,73 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 
-service = Service('./chromedriver-win64/chromedriver.exe')
-driver = webdriver.Chrome(service=service)
+def return_cities_list():
+    # Bakılacak yerin önce temizlenmesi gerekebilir
+    from_side_btn = driver.find_element(By.ID, "headlessui-combobox-button-:R1a9lla:")
+    from_side_btn.click()
+    from_side_btn_values = driver.find_element(By.ID, "headlessui-combobox-options-:R1q9lla:")
+    cities = from_side_btn_values.text.split("\n")
+    new_cities = []
+    for i, j in enumerate(cities):
+        if i % 2 == 0:
+            new_cities.append(j)
+    return new_cities
 
-driver.maximize_window()
-
-driver.get('https://flights-app.pages.dev/')
-page_link = driver.current_url
-page_title = driver.title
-print(page_title, page_link)
-
-from_side = driver.find_element(By.ID, "headlessui-combobox-input-:Rq9lla:")
-#from_side.click()
-
-from_side_btn = driver.find_element(By.ID, "headlessui-combobox-button-:R1a9lla:")
-from_side_btn.click()
-from_side_btn_values = driver.find_element(By.ID, "headlessui-combobox-options-:R1q9lla:")
-cities = from_side_btn_values.text.split("\n")
-
-to_side = driver.find_element(By.ID, "headlessui-combobox-input-:Rqhlla:")
-
-for city in cities:
-    from_side.send_keys(city)
+def write_from_side(string, element_id="headlessui-combobox-input-:Rq9lla:"):
+    from_side = driver.find_element(By.ID, element_id)
+    from_side.send_keys(string)
     from_side.send_keys(Keys.ENTER)
-    to_side.send_keys(city[:3])
+
+def write_to_side(string, element_id="headlessui-combobox-input-:Rqhlla:"):
+    to_side = driver.find_element(By.ID, element_id)
+    to_side.send_keys(string[:3])
     to_side.send_keys(Keys.ENTER)
-    if to_side.get_attribute("value") == city:
-        print("hata1")
-        break
-    #refresh ve tamamını kontrol etmek için düzeltme gerekli(wrap by while)
-    # yada tanımlamalar sıfırlanıyor olabilir refresh'den sonra
-    driver.refresh()
+
+def read_from_side(element_id="headlessui-combobox-input-:Rq9lla:"):
+    from_side = driver.find_element(By.ID, element_id)
+    return from_side.get_attribute("value")
+
+def read_to_side(element_id="headlessui-combobox-input-:Rqhlla:"):
+    to_side=driver.find_element(By.ID, element_id)
+    return to_side.get_attribute("value")
+
+def count_by_text(css_selector="p.mb-10"):
+    write_from_side("ist")
+    write_to_side("los")
+    found_x_items = driver.find_element(By.CSS_SELECTOR, css_selector)
+    found_x_items = found_x_items.text.split(" ")
+    number = ""
+    for i in found_x_items:
+        # Regex kullanmak daha mantıklı
+        try:
+            if type(int(i)) == int:
+                number += i
+        except:
+            pass
+        else:
+            number = int(number)
+    return number
+
+def count_tables(copy_selector=
+     r"body > main > div.mt-24.max-w-5xl.w-full.justify-center.items-center.text-sm.lg\:flex > div > ul"):
+    write_from_side("ist")
+    write_to_side("los")
+    table_items_ul = driver.find_element(By.CSS_SELECTOR, copy_selector)
+    table_items_inner_ul = table_items_ul.find_elements(By.TAG_NAME, "li")
+    return len(table_items_inner_ul)
 
 
-driver.refresh()
+if __name__ == "__main__":
+    service = Service('./chromedriver-win64/chromedriver.exe')
+    driver = webdriver.Chrome(service=service)
 
-from_side = driver.find_element(By.ID, "headlessui-combobox-input-:Rq9lla:")
-from_side.send_keys("ist")
-from_side.send_keys(Keys.ENTER)
-to_side = driver.find_element(By.ID, "headlessui-combobox-input-:Rqhlla:")
-to_side.send_keys("los")
-to_side.send_keys(Keys.ENTER)
+    driver.maximize_window()
 
-found_x_items = driver.find_element(By.CSS_SELECTOR, "p.mb-10")
-found_x_items = found_x_items.text.split(" ")
-number = -1
-for i in found_x_items:
-    # Regex kullanmak daha mantıklı
-    try:
-        if type(int(i)) == int:
-            number = int(i)
-            print(number)
-    except:
-        pass
+    test_link = 'https://flights-app.pages.dev/'
 
-table_items_css_class = "grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8"
-copy_selector = r"body > main > div.mt-24.max-w-5xl.w-full.justify-center.items-center.text-sm.lg\:flex > div > ul"
-table_items_ul = driver.find_element(By.CSS_SELECTOR, copy_selector)
-table_items_inner_ul = table_items_ul.find_elements(By.TAG_NAME, "li")
-print(type(table_items_inner_ul))
-print(len(table_items_inner_ul))
-if number == len(table_items_inner_ul):
-    pass
-else:
-    print("hata2")
-#print(len(table_items))
+    driver.get(test_link)
+    page_link = driver.current_url
+    page_title = driver.title
+    print(page_title, page_link)
 
-#/html/body/main/div[2]/div/ul
-
-time.sleep(1)
+    time.sleep(1)
