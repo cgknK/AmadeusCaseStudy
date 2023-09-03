@@ -1,33 +1,28 @@
 import requests, json
 
-def get_request_response(url):
-    #r_list.append(requests.get(url, headers=headers))
-    r = requests.get(url)
+def get_response(url, headers=None):
+    """Api çağrısı ve response"""
+    r = requests.get(url, headers)
+    return r
 
-    # Store API response in a variable.
+def get_dict(r):
+    """Return a set of dicts representing the most popular repositories."""
     response_dict = r.json()
-    #print(type(response_dict))
-    #repo_dicts = response_dict['items']
+    return response_dict
 
-    status_code = r.status_code
-    """
-    if r.status_code == 200:
-        status_code = 200
-    elif r.status_code // 100 == 2:
-        status_code = 2
-    else:
-        pass
-    """
-
-    response_content_type = r.headers["Content-Type"]
-
-    return response_dict, status_code, response_content_type
+def get_content_type(r):
+    content_type = r.headers["Content-Type"]
+    return content_type
 
 if __name__ == '__main__':
     api_url = f'https://flights-api.buraky.workers.dev/'
-    sonuclar, durum, content_type = get_request_response(api_url)
-    print(durum, content_type)
-    
+
+    r = get_response(api_url)
+    json_dict = get_dict(r)
+
     filename = 'api_dump.json'
     with open(filename, 'w') as f:
-        json.dump(sonuclar, f, indent=4)
+        json.dump(json_dict, f, indent=4)
+
+
+    
