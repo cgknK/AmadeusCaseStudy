@@ -6,11 +6,12 @@ def get_response(url, headers=None):
     return r
 
 def get_dict(r):
-    """Return a set of dicts representing the most popular repositories."""
+    """Return a set of dicts by api data."""
     response_dict = r.json()
     return response_dict
 
 def get_content_type(r):
+    """Return a "Content-Type"."""
     content_type = r.headers["Content-Type"]
     return content_type
 

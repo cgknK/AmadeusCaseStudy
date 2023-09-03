@@ -22,7 +22,6 @@ class BackendTestCases(unittest.TestCase):
                 [random.randint(1, len(self.r_dict["data"]) -1)])
             self.assertTrue(key in self.r_dict["data"][-1])
 
-
     def test_content_type(self):
         self.assertEqual(self.r.headers["Content-Type"], f'application/json')
 
