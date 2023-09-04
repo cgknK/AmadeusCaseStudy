@@ -1,4 +1,4 @@
-import unittest, os, sys
+import pytest, os, sys
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -9,10 +9,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 """
 import frontend_case_analysis as fca
 
-class FrontendTestCases(unittest.TestCase):
+class TestFrontendCases:
     """Tests for UI."""
 
-    def setUp(self):
+    @pytest.fixture(scope="function")
+    def driver_setup(self):
+        #print("setup_method+")
         self.service = Service('./chromedriver-win64/chromedriver.exe')
         self.driver = webdriver.Chrome(service=self.service)
         self.driver.maximize_window()
@@ -27,43 +29,46 @@ class FrontendTestCases(unittest.TestCase):
             for file in os.listdir("./res"):
                 file_path = os.path.join("./res", file)
                 os.remove(file_path)
+        #print("setup_method.")
 
-    def tearDown(self):
+        yield self.driver
+
+        self.driver.quit()
+
+    @pytest.fixture(scope="function")
+    def teardown_method(self, request):
         #error = sys.exc_info()
-        print("s._t", self._testMethodName)
+        print("s._t", request.node.name)
+        print("s._t2", request.node.originalname )
         print("sys[0]", sys.exc_info()[0])
         print("sys[1]", sys.exc_info()[1])
         print("sys[2]", sys.exc_info()[2])
         if sys.exc_info()[0]:
-            test_method_name = self._testMethodName
+            test_method_name = request.node.name
             self.driver.save_screenshot(f"./res/{test_method_name}.png")
-        self.driver.quit()
-
-    def test_not_same_value(self):
+        #self.driver.quit()
         self.driver.refresh()
+
+
+    def test_not_same_value(self, driver_setup, teardown_method):
+        #print("test_not_same_value+")
+        #self.driver.refresh()
         for i in self.cities:
             fca.write_from_side(self.driver, i)
             fca.write_to_side(self.driver, i)
-            self.assertNotEqual(fca.read_from_side(self.driver), 
-                    fca.read_to_side(self.driver))
+            assert fca.read_from_side(self.driver) != fca.read_to_side(self.driver)
         #ResourceWarning self.driver.exit()/quit()
         #self.driver.quit()
+        #print("test_not_same_value.")
 
-    #def _helper(self):
-        #pass
 
-    def test_same_x(self):
-        self.driver.refresh()
+    def test_same_x(self, driver_setup, teardown_method):
+        #print("test_same_x.")
+        #self.driver.refresh()
         for i in self.cities[:3]:
             for j in self.cities[-3:]:
                 if i != j:
-                    self.assertEqual(
-                            fca.count_by_text(self.driver, string1=i, string2=j),
-                            fca.count_tables(self.driver, string1=i, string2=j))
+                    assert fca.count_by_text(self.driver, string1=i, string2=j) \
+                            == fca.count_tables(self.driver, string1=i, string2=j)
         #ResourceWarning
         #self.driver.exit/quit çözmüyor
-        #self.driver.quit()
-
-
-if __name__ == '__main__':
-    unittest.main()

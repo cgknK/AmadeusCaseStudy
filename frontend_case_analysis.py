@@ -1,9 +1,15 @@
 import time, os, random
 
 from selenium import webdriver
+#from selenium.webdriver import Chrome
+
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver import Keys
+
+# Bu nasıl durduk yere hata verdi
+#from selenium.webdriver import Keys
+from selenium.webdriver.common.keys import Keys
+
 from selenium.webdriver.support.ui import WebDriverWait
 
 def return_cities_list(driver):
