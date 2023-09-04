@@ -2,10 +2,11 @@ import unittest
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+"""
 from selenium.webdriver.common.by import By
 from selenium.webdriver import Keys
 from selenium.webdriver.support.ui import WebDriverWait
-
+"""
 import frontend_case_analysis as fca
 
 class FrontendTestCases(unittest.TestCase):
@@ -20,6 +21,9 @@ class FrontendTestCases(unittest.TestCase):
         self.cities = fca.return_cities_list(self.driver)
         self.driver.refresh()
 
+    def tearDown(self):
+        self.driver.quit()
+
     def test_not_same_value(self):
         self.driver.refresh()
         for i in self.cities:
@@ -28,6 +32,7 @@ class FrontendTestCases(unittest.TestCase):
             self.assertNotEqual(fca.read_from_side(self.driver), 
                     fca.read_to_side(self.driver))
         #ResourceWarning self.driver.exit()/quit()
+        self.driver.quit()
 
     #def _helper(self):
         #pass
@@ -42,6 +47,7 @@ class FrontendTestCases(unittest.TestCase):
                             fca.count_tables(self.driver, string1=i, string2=j))
         #ResourceWarning
         #self.driver.exit/quit çözmüyor
+        self.driver.quit()
 
 
 if __name__ == '__main__':
